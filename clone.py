@@ -1,5 +1,5 @@
 import matplotlib.pyplot as plt
-import matplotlib.image as mpimgloLo
+import matplotlib.image as mpimg
 from sklearn.model_selection import train_test_split
 from helper import *
 
@@ -16,9 +16,9 @@ from linear import linear
 from lenet import lenet
 from nvidia import nvidia
 
-models = {"linear-model" : linear()}
-          #"lenet-model" : lenet(),
-          #"nvidia-model" : nvidia()}
+models = {"linear-model" : linear(),
+          "lenet-model" : lenet(),
+          "nvidia-model" : nvidia()}
 
 for model_name in models.keys():
     print("Traning model", model_name)
@@ -30,9 +30,10 @@ for model_name in models.keys():
                                         samples_per_epoch= len(train_samples),
                                         validation_data=validation_generator,
                                         nb_val_samples=len(validation_samples),
-                                        nb_epoch=3, verbose=1)
+                                        nb_epoch=1, verbose=1)
 
     # Visualize loss
+    '''
     plt.plot(history_object.history['loss'])
     plt.plot(history_object.history['val_loss'])
     plt.title('model mean squared error loss')
@@ -40,5 +41,6 @@ for model_name in models.keys():
     plt.xlabel('epoch')
     plt.legend(['training set', 'validation set'], loc='upper right')
     plt.savefig(model_name+'-loss.png')
+    '''
 
     model.save(model_name + '.h5')

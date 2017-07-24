@@ -1,5 +1,4 @@
 import csv
-import cv2
 import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib.image as mpimg
@@ -27,52 +26,32 @@ def generator(samples, batch_size=32):
             angles = []
             for batch_sample in batch_samples:
                 # process batch sample
-                image_list, angle_list = gen_images_and_angles(batch_sample)
-                images.extend(image_list)
-                angles.extend(angle_list)
-                flip_image_list, flip_angle_list = flip(image_list, angle_list)
-                images.extend(flip_image_list)
-                angles.extend(flip_angle_list)
+                images_data, angles_data = process_line(batch_sample)
+                images.extend(images_data)
+                angles.extend(angles_data)
 
             X_train = np.array(images)
             y_train = np.array(angles)
             yield shuffle(X_train, y_train)
 
-'''Process batch sample and generate images and angles'''
-def gen_images_and_angles(batch_sample):
+'''Process line, return images, angles, flipped images and flipped angles'''
+def process_line(line):
     images = []
     angles = []
 
-    # Read images
-    center_image_path = './data/IMG/'+batch_sample[0].split('/')[-1]
-    center_image = cv2.imread(center_image_path)
-    left_image_path = './data/IMG/'+batch_sample[1].split('/')[-1]
-    left_image = cv2.imread(left_image_path)
-    right_image_path = './data/IMG/'+batch_sample[2].split('/')[-1]
-    right_image = cv2.imread(right_image_path)
-    images.append(center_image)
-    images.append(left_image)
-    images.append(right_image)
+    image_dir = './data/IMG/'
+    correction = [0, 0.2, -0.2]
+    for i in range(3):
+        # read the image
+        image_path = image_dir + line[i].split('/')[-1]
+        image = mpimg.imread(image_path)
+        images.append(image)
+        angle = float(line[3]) + correction[i]
+        angles.append(angle)
 
-    # Read angles
-    correction = 0.2
-    center_angle = float(batch_sample[3])
-    left_angle = center_angle + correction
-    right_angle = center_angle - correction
-    angles.append(center_angle)
-    angles.append(left_angle)
-    angles.append(right_angle)
-    return images, angles
-
-'''Flip images and angles'''
-def flip(images, angles):
-    flip_images = []
-    flip_angles = []
-    for i in range(len(images)):
-        image = images[i]
-        angle = angles[i]
+        # flip the image
         image_flipped = np.fliplr(image)
+        images.append(image_flipped)
         angle_flipped = -angle
-        flip_images.append(image_flipped)
-        flip_angles.append(angle_flipped)
-    return flip_images, flip_angles
+        angles.append(angle_flipped)
+    return images, angles

@@ -16,9 +16,11 @@ from linear import linear
 from lenet import lenet
 from nvidia import nvidia
 
-models = {"linear-model" : linear(),
-          "lenet-model" : lenet(),
-          "nvidia-model" : nvidia()}
+#models = {"linear-model" : linear(),
+#          "lenet-model" : lenet(),
+#          "nvidia-model" : nvidia()}
+
+models = {"nvidia-model" : nvidia()}
 
 for model_name in models.keys():
     print("Traning model", model_name)
@@ -27,20 +29,19 @@ for model_name in models.keys():
     model.compile(loss='mse', optimizer='adam')
 
     history_object = model.fit_generator(train_generator,
-                                        samples_per_epoch= len(train_samples),
+                                        samples_per_epoch= 6*len(train_samples),
                                         validation_data=validation_generator,
-                                        nb_val_samples=len(validation_samples),
-                                        nb_epoch=1, verbose=1)
+                                        nb_val_samples=6*len(validation_samples),
+                                        nb_epoch=8, verbose=1)
 
     # Visualize loss
-    '''
+    
     plt.plot(history_object.history['loss'])
     plt.plot(history_object.history['val_loss'])
     plt.title('model mean squared error loss')
     plt.ylabel('mean squared error loss')
     plt.xlabel('epoch')
     plt.legend(['training set', 'validation set'], loc='upper right')
-    plt.savefig(model_name+'-loss.png')
-    '''
+    plt.show()
 
     model.save(model_name + '.h5')
